@@ -1,4 +1,4 @@
-package com.facebook.dgisser.new_york_times;
+package com.facebook.dgisser.new_york_times.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.dgisser.new_york_times.Models.Article;
+import com.facebook.dgisser.new_york_times.R;
 import com.facebook.dgisser.new_york_times.activities.ArticleActivity;
 import com.squareup.picasso.Picasso;
 

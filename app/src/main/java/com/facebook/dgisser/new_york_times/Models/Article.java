@@ -1,4 +1,4 @@
-package com.facebook.dgisser.new_york_times;
+package com.facebook.dgisser.new_york_times.Models;
 
 import android.util.Log;
 

@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.facebook.dgisser.new_york_times.Article;
+import com.facebook.dgisser.new_york_times.Models.Article;
 import com.facebook.dgisser.new_york_times.R;
 
 public class ArticleActivity extends AppCompatActivity {

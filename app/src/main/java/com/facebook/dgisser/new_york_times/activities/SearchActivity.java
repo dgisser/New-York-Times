@@ -1,16 +1,15 @@
 package com.facebook.dgisser.new_york_times.activities;
 
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 
 import com.facebook.dgisser.new_york_times.Adapters.ArticleArrayAdapter;
 import com.facebook.dgisser.new_york_times.EndlessRecyclerViewScrollListener;
@@ -30,14 +29,14 @@ import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
 
-    EditText etQuery;
-    Button btnSearch;
     String queryString;
     StaggeredGridLayoutManager layoutManager;
+    int page;
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
     RecyclerView rvResults;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,8 +48,6 @@ public class SearchActivity extends AppCompatActivity {
 
     public void setupViews() {
         rvResults = (RecyclerView) findViewById(R.id.rvResults);
-        etQuery = (EditText) findViewById(R.id.etQuery);
-        btnSearch = (Button) findViewById(R.id.btnSearch);
         articles = new ArrayList<>();
         adapter = new ArticleArrayAdapter(articles);
         assert rvResults != null;
@@ -67,13 +64,32 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_search, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // perform query here
+                queryString = query;
+                articleSearch();
+                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
+                // see https://code.google.com/p/android/issues/detail?id=24599
+                searchView.clearFocus();
 
-        return true;
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+
     }
 
     @Override
@@ -91,9 +107,9 @@ public class SearchActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onArticleSearch(View view) {
+    public void articleSearch() {
         articles.clear();
-        queryString = etQuery.getText().toString();
+        page = 0;
         AsyncHttpClient client = new AsyncHttpClient();
         String apiKey = getResources().getString(R.string.nyt_api_key);
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -111,7 +127,6 @@ public class SearchActivity extends AppCompatActivity {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
-                    Log.d("SearchActivity",String.format("%d",articles.size()));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -125,12 +140,13 @@ public class SearchActivity extends AppCompatActivity {
         // Send an API request to retrieve appropriate data using the offset value as a parameter.
         // Deserialize API response and then construct new objects to append to the adapter
         // Add the new objects to the data source for the adapter
+        page ++;
         AsyncHttpClient client = new AsyncHttpClient();
         String apiKey = getResources().getString(R.string.nyt_api_key);
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", apiKey);
-        params.put("page",offset);
+        params.put("page",page);
         params.put("q", queryString);
 
         client.get(url, params, new JsonHttpResponseHandler() {
@@ -149,7 +165,6 @@ public class SearchActivity extends AppCompatActivity {
                     });
                     articles.addAll(Article.fromJSONArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
-                    Log.d("SearchActivity",String.format("%d",articles.size()));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -25,6 +25,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import cz.msebera.android.httpclient.Header;
 
 public class SearchActivity extends AppCompatActivity {
@@ -35,19 +37,19 @@ public class SearchActivity extends AppCompatActivity {
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
-    RecyclerView rvResults;
+    @BindView(R.id.rvResults) RecyclerView rvResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+        ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         setupViews();
     }
 
     public void setupViews() {
-        rvResults = (RecyclerView) findViewById(R.id.rvResults);
         articles = new ArrayList<>();
         adapter = new ArticleArrayAdapter(articles);
         assert rvResults != null;

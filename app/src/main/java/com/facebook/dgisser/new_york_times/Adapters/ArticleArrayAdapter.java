@@ -18,6 +18,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by dgisser on 6/19/16.
  */
@@ -26,8 +29,8 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
-        public TextView tvTitle;
-        public ImageView ivImage;
+        @BindView(R.id.tvTitle) TextView tvTitle;
+        @BindView(R.id.ivImage) ImageView ivImage;
         private Context context;
 
         // We also create a constructor that accepts the entire item row
@@ -36,9 +39,7 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
             // Stores the itemView in a public final member variable that can be used
             // to access the context from any ViewHolder instance.
             super(itemView);
-
-            this.tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            this.ivImage = (ImageView) itemView.findViewById(R.id.ivImage);
+            ButterKnife.bind(this,itemView);
             this.context = context;
             itemView.setOnClickListener(this);
         }

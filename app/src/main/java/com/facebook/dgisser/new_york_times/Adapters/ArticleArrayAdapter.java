@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,8 +92,8 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
         String thumbnail = article.getThumbNail();
 
         if (!TextUtils.isEmpty(thumbnail)) {
-            Log.d("articleArrayAdapter",thumbnail);
-            Picasso.with(ivImage.getContext()).load(thumbnail).into(ivImage);
+            Picasso.with(ivImage.getContext()).load("http://www.nytimes.com/" +
+                    thumbnail).into(ivImage);
         }
 
     }

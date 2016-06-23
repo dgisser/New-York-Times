@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,12 +16,14 @@ import com.facebook.dgisser.new_york_times.Adapters.ArticleArrayAdapter;
 import com.facebook.dgisser.new_york_times.EndlessRecyclerViewScrollListener;
 import com.facebook.dgisser.new_york_times.Models.Article;
 import com.facebook.dgisser.new_york_times.R;
+import com.facebook.dgisser.new_york_times.api.Example;
+import com.facebook.dgisser.new_york_times.api.Response;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -37,7 +40,8 @@ public class SearchActivity extends AppCompatActivity {
 
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
-    @BindView(R.id.rvResults) RecyclerView rvResults;
+    @BindView(R.id.rvResults)
+    RecyclerView rvResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,7 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -117,21 +122,26 @@ public class SearchActivity extends AppCompatActivity {
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", apiKey);
-        params.put("page",0);
+        params.put("page", page);
         params.put("q", queryString);
 
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    articles.addAll(Article.fromJSONArray(articleJsonResults));
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                Gson gson = new GsonBuilder().create();
+                Response responseObj = gson.fromJson(response.toString(), Example.class).getResponse();
+                for (int x = 0; x < responseObj.getDocs().size(); x++) {
+                    String url;
+                    if (responseObj.getDocs().get(x).getMultimedia().size() == 0) {
+                        url = "";
+                    } else {
+                        url = responseObj.getDocs().get(x).getMultimedia().get(0).getUrl();
+                        Log.d("url","ok "+ responseObj.getDocs().get(x).getMultimedia().get(0).getUrl());
+                    }
+                    articles.add(new Article(responseObj.getDocs().get(x).getWebUrl(),
+                            responseObj.getDocs().get(x).getHeadline().getMain(), url));
                 }
+                adapter.notifyDataSetChanged();
             }
         });
     }
@@ -139,42 +149,53 @@ public class SearchActivity extends AppCompatActivity {
     // Append more data into the adapter
     // This method probably sends out a network request and appends new data items to your adapter.
     public void customLoadMoreDataFromApi(int offset) {
+        Log.d("searchactivity","called");
         // Send an API request to retrieve appropriate data using the offset value as a parameter.
         // Deserialize API response and then construct new objects to append to the adapter
         // Add the new objects to the data source for the adapter
-        page ++;
+        page++;
         AsyncHttpClient client = new AsyncHttpClient();
         String apiKey = getResources().getString(R.string.nyt_api_key);
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
         RequestParams params = new RequestParams();
         params.put("api-key", apiKey);
-        params.put("page",page);
+        params.put("page", page);
         params.put("q", queryString);
 
         client.get(url, params, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                JSONArray articleJsonResults = null;
-
-                try {
-                    articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
-                    rvResults.clearOnScrollListeners();
-                    rvResults.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
-                        @Override
-                        public void onLoadMore(int page, int totalItemsCount) {
-                            customLoadMoreDataFromApi(page);
-                        }
-                    });
-                    articles.addAll(Article.fromJSONArray(articleJsonResults));
-                    adapter.notifyDataSetChanged();
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                rvResults.clearOnScrollListeners();
+                rvResults.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+                    @Override
+                    public void onLoadMore(int page, int totalItemsCount) {
+                        customLoadMoreDataFromApi(page);
+                    }
+                });
+                Gson gson = new GsonBuilder().create();
+                Response responseObj = gson.fromJson(response.toString(), Example.class).getResponse();
+                for (int x = 0; x < responseObj.getDocs().size(); x++) {
+                    String url;
+                    if (responseObj.getDocs().get(x).getMultimedia().size() == 0) {
+                        url = "";
+                    } else {
+                        url = responseObj.getDocs().get(x).getMultimedia().get(0).getUrl();
+                    }
+                    articles.add(new Article((responseObj.getDocs().get(x)).getWebUrl(),
+                            responseObj.getDocs().get(x).getHeadline().getMain(), url));
                 }
+                int curSize = adapter.getItemCount();
+                adapter.notifyItemRangeChanged(curSize, articles.size() - curSize - 1);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.d("SearchActivity",responseString);
+                super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
         // For efficiency purposes, notify the adapter of only the elements that got changed
         // curSize will equal to the index of the first element inserted because the list is 0-indexed
-        int curSize = adapter.getItemCount();
-        adapter.notifyItemRangeInserted(curSize, articles.size() - 1);
+        //
     }
 }

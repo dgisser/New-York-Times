@@ -1,11 +1,14 @@
 package com.facebook.dgisser.new_york_times.Models;
 
-import java.io.Serializable;
+
+import org.parceler.Parcel;
+
 
 /**
  * Created by dgisser on 6/19/16.
  */
-public class Article implements Serializable {
+@Parcel
+public class Article{
     String webUrl;
 
     public String getWebUrl() {
@@ -22,6 +25,8 @@ public class Article implements Serializable {
 
     String headline;
     String thumbNail;
+
+    public Article() {}
 
     public Article(String webUrl, String headline, String url) {
         this.webUrl = webUrl;

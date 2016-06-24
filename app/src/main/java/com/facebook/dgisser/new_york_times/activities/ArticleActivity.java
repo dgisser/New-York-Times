@@ -15,6 +15,8 @@ import android.webkit.WebViewClient;
 import com.facebook.dgisser.new_york_times.Models.Article;
 import com.facebook.dgisser.new_york_times.R;
 
+import org.parceler.Parcels;
+
 public class ArticleActivity extends AppCompatActivity {
 
     @Override
@@ -24,7 +26,7 @@ public class ArticleActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Article article = (Article) getIntent().getSerializableExtra("article");
+        Article article = (Article) Parcels.unwrap(getIntent().getParcelableExtra("article"));
 
         WebView webView = (WebView) findViewById(R.id.wvArticle);
         assert webView != null;

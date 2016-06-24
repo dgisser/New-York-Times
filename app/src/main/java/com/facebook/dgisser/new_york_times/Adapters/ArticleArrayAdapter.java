@@ -15,6 +15,8 @@ import com.facebook.dgisser.new_york_times.Models.Article;
 import com.facebook.dgisser.new_york_times.R;
 import com.facebook.dgisser.new_york_times.activities.ArticleActivity;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import butterknife.BindView;
@@ -47,14 +49,8 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
         public void onClick(View view) {
             int position = getLayoutPosition(); // gets item position
             Article article = mArticles.get(position);
-            // We can access the data within the views
-
-            //create an intent to display the article
             Intent i = new Intent(view.getContext(), ArticleActivity.class);
-            //get the article to display
-            //pass in that article into intent
-            i.putExtra("article", article);
-            //launch activity
+            i.putExtra("article", Parcels.wrap(article));
             view.getContext().startActivity(i);
         }
     }

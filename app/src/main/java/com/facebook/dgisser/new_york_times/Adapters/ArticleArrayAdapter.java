@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.facebook.dgisser.new_york_times.Models.Article;
 import com.facebook.dgisser.new_york_times.R;
 import com.facebook.dgisser.new_york_times.activities.ArticleActivity;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -92,8 +92,7 @@ public class ArticleArrayAdapter extends RecyclerView.Adapter<ArticleArrayAdapte
         String thumbnail = article.getThumbNail();
 
         if (!TextUtils.isEmpty(thumbnail)) {
-            Picasso.with(ivImage.getContext()).load("http://www.nytimes.com/" +
-                    thumbnail).into(ivImage);
+            Glide.with(ivImage.getContext()).load(thumbnail).into(ivImage);
         }
 
     }

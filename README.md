@@ -1,0 +1,1 @@
+I have completed all of the optional tasks for New York Times. Check it out in action at http://imgur.com/hhJ2HSP. This fetches articles from the New York Times and allows you to filter some categories. You can also share articles with friends.

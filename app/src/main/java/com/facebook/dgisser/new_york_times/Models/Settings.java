@@ -28,44 +28,24 @@ public class Settings {
     int flags;
     int pos;
 
-    public int getYear() {
-        return year;
+    public String getDate() {
+        return date;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDay() {
-        return day;
-    }
-
-    public void setDay(int day) {
-        this.day = day;
-    }
-
-    int year;
-    int month;
-    int day;
+    String date;
 
     public Settings(){
 
     }
 
-    public Settings(int flags, int pos, int year, int month, int day) {
+    public Settings(int flags, int pos, String date) {
         this.flags = flags;
         this.pos = pos;
-        this.year = year;
-        this.month = month;
-        this.day = day;
+        this.date = date;
     }
 
 }

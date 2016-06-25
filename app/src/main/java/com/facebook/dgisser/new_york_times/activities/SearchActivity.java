@@ -70,7 +70,7 @@ public class SearchActivity extends AppCompatActivity {
         assert rvResults != null;
         rvResults.setAdapter(adapter);
         layoutManager =
-                new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+                new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         rvResults.setLayoutManager(layoutManager);
         rvResults.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
@@ -233,9 +233,8 @@ public class SearchActivity extends AppCompatActivity {
             Settings settings = (Settings) Parcels.unwrap(data.getParcelableExtra("settings"));
             flags = settings.getFlags();
             pos = settings.getPos() + 1;
-            startDate = String.format("%d%02d%02d",settings.getYear(),
-                            settings.getMonth(), settings.getDay());
-            Log.d("searchActivity",startDate);
+            startDate = settings.getDate();
+            Log.d("searchActivity","startdate: " + startDate);
         }
     }
 }
